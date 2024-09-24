@@ -14,20 +14,15 @@ void printUsage()
             << "  --help   -h                   Show this help message.\n";
 }
 
-int main(int argc, char *argv[])
+// Function to parse command-line arguments
+bool parseArguments(int argc, char *argv[], std::string &mode, std::string &inputFile, std::string &outputFile)
 {
-  // Check if the user has provided the minimum number of arguments
   if (argc < 2)
   {
     std::cerr << "Error: Missing arguments.\n";
     printUsage();
-    return 1;
+    return false;
   }
-
-  // Parse command-line arguments
-  std::string mode;
-  std::string inputFile;
-  std::string outputFile;
 
   for (int i = 1; i < argc; ++i)
   {
@@ -39,7 +34,7 @@ int main(int argc, char *argv[])
       {
         std::cerr << "Error: Missing input or output file for encoding.\n";
         printUsage();
-        return 1;
+        return false;
       }
       mode = "encode";
       inputFile = argv[++i];
@@ -51,7 +46,7 @@ int main(int argc, char *argv[])
       {
         std::cerr << "Error: Missing input or output file for decoding.\n";
         printUsage();
-        return 1;
+        return false;
       }
       mode = "decode";
       inputFile = argv[++i];
@@ -60,22 +55,68 @@ int main(int argc, char *argv[])
     else if (arg == "--help" || arg == "-h")
     {
       printUsage();
-      return 0;
+      return false; // Return false to indicate no further action is needed
     }
     else
     {
       std::cerr << "Error: Unknown option: " << arg << "\n";
       printUsage();
-      return 1;
+      return false;
     }
   }
 
-  // Ensure the mode is set (either encoding or decoding)
   if (mode.empty())
   {
     std::cerr << "Error: No operation mode specified.\n";
     printUsage();
-    return 1;
+    return false;
+  }
+
+  return true;
+}
+
+// Function to handle file encoding
+void handleEncoding(const std::string &inputFile, const std::string &outputFile)
+{
+  // Calculate character frequencies from the input file
+  std::unordered_map<char, int> frequencies = calculateFrequencies(inputFile);
+  if (frequencies.empty())
+  {
+    std::cerr << "Error: Input file is empty or not found: " << inputFile << "\n";
+    return;
+  }
+
+  // Build and generate Huffman codes
+  HuffmanTree huffmanTree;
+  huffmanTree.build(frequencies);
+  huffmanTree.generateCodes(huffmanTree.getRoot(), "");
+
+  // Retrieve the generated Huffman codes
+  std::unordered_map<char, std::string> codes = huffmanTree.getCodes();
+
+  // Encode the input file
+  encodeFile(inputFile, outputFile, huffmanTree, codes);
+  std::cout << "Encoding completed. Encoded data saved to " << outputFile << std::endl;
+}
+
+// Function to handle file decoding
+void handleDecoding(const std::string &inputFile, const std::string &outputFile)
+{
+  // Decode the encoded file back to its original content
+  decodeFile(inputFile, outputFile);
+  std::cout << "Decoding completed. Decoded data saved to " << outputFile << std::endl;
+}
+
+int main(int argc, char *argv[])
+{
+  std::string mode;
+  std::string inputFile;
+  std::string outputFile;
+
+  // Parse command-line arguments
+  if (!parseArguments(argc, argv, mode, inputFile, outputFile))
+  {
+    return 1; // Exit if argument parsing fails or --help is displayed
   }
 
   // Ensure the output directory exists
@@ -84,31 +125,11 @@ int main(int argc, char *argv[])
   // Perform the selected operation
   if (mode == "encode")
   {
-    // Calculate character frequencies from the input file
-    std::unordered_map<char, int> frequencies = calculateFrequencies(inputFile);
-    if (frequencies.empty())
-    {
-      std::cerr << "Error: Input file is empty or not found: " << inputFile << "\n";
-      return 1;
-    }
-
-    // Build and generate Huffman codes
-    HuffmanTree huffmanTree;
-    huffmanTree.build(frequencies);
-    huffmanTree.generateCodes(huffmanTree.getRoot(), "");
-
-    // Retrieve the generated Huffman codes
-    std::unordered_map<char, std::string> codes = huffmanTree.getCodes();
-
-    // Encode the input file
-    encodeFile(inputFile, outputFile, huffmanTree, codes);
-    std::cout << "Encoding completed. Encoded data saved to " << outputFile << std::endl;
+    handleEncoding(inputFile, outputFile);
   }
   else if (mode == "decode")
   {
-    // Decode the encoded file back to its original content
-    decodeFile(inputFile, outputFile);
-    std::cout << "Decoding completed. Decoded data saved to " << outputFile << std::endl;
+    handleDecoding(inputFile, outputFile);
   }
 
   return 0;
