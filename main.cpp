@@ -56,7 +56,7 @@ bool parseArguments(int argc, char *argv[], std::string &mode, std::string &inpu
     else if (arg == "--help" || arg == "-h")
     {
       printUsage();
-      return false; // Return false to indicate no further action is needed
+      return false;
     }
     else
     {
@@ -90,26 +90,34 @@ bool isFileWritable(const std::string &filename)
   return outfile.good();
 }
 
-// Function to handle file encoding with enhanced error handling
+// Function to calculate the size of a file in bytes
+std::size_t getFileSize(const std::string &filename)
+{
+  std::ifstream in(filename, std::ifstream::ate | std::ifstream::binary);
+  if (!in)
+  {
+    throw std::runtime_error("Error: Could not open file: " + filename);
+  }
+  return in.tellg();
+}
+
+// Function to handle file encoding with compression ratio display
 void handleEncoding(const std::string &inputFile, const std::string &outputFile)
 {
   try
   {
-    // Check if input file is readable
     if (!isFileReadable(inputFile))
     {
       std::cerr << "Error: Cannot read input file: " << inputFile << "\n";
       return;
     }
 
-    // Check if output file can be written
     if (!isFileWritable(outputFile))
     {
       std::cerr << "Error: Cannot write to output file: " << outputFile << "\n";
       return;
     }
 
-    // Calculate character frequencies from the input file
     std::unordered_map<char, int> frequencies = calculateFrequencies(inputFile);
     if (frequencies.empty())
     {
@@ -117,17 +125,28 @@ void handleEncoding(const std::string &inputFile, const std::string &outputFile)
       return;
     }
 
-    // Build and generate Huffman codes
     HuffmanTree huffmanTree;
     huffmanTree.build(frequencies);
     huffmanTree.generateCodes(huffmanTree.getRoot(), "");
 
-    // Retrieve the generated Huffman codes
     std::unordered_map<char, std::string> codes = huffmanTree.getCodes();
 
-    // Encode the input file
     encodeFile(inputFile, outputFile, huffmanTree, codes);
     std::cout << "Encoding completed. Encoded data saved to " << outputFile << std::endl;
+
+    std::size_t originalSize = getFileSize(inputFile);
+    std::size_t encodedSize = getFileSize(outputFile);
+
+    if (encodedSize == 0)
+    {
+      std::cerr << "Error: Encoded file is empty. Compression ratio cannot be calculated.\n";
+      return;
+    }
+
+    double compressionRatio = static_cast<double>(originalSize) / encodedSize;
+    std::cout << "Original Size: " << originalSize << " bytes\n";
+    std::cout << "Encoded Size: " << encodedSize << " bytes\n";
+    std::cout << "Compression Ratio: " << compressionRatio << "\n";
   }
   catch (const std::exception &e)
   {
@@ -140,21 +159,18 @@ void handleDecoding(const std::string &inputFile, const std::string &outputFile)
 {
   try
   {
-    // Check if input file is readable
     if (!isFileReadable(inputFile))
     {
       std::cerr << "Error: Cannot read input file: " << inputFile << "\n";
       return;
     }
 
-    // Check if output file can be written
     if (!isFileWritable(outputFile))
     {
       std::cerr << "Error: Cannot write to output file: " << outputFile << "\n";
       return;
     }
 
-    // Decode the encoded file back to its original content
     decodeFile(inputFile, outputFile);
     std::cout << "Decoding completed. Decoded data saved to " << outputFile << std::endl;
   }
@@ -173,10 +189,9 @@ int main(int argc, char *argv[])
   // Parse command-line arguments
   if (!parseArguments(argc, argv, mode, inputFile, outputFile))
   {
-    return 1; // Exit if argument parsing fails or --help is displayed
+    return 1;
   }
 
-  // Ensure the output directory exists
   try
   {
     createDirectoryIfNotExists("output");
@@ -187,7 +202,6 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  // Perform the selected operation
   if (mode == "encode")
   {
     handleEncoding(inputFile, outputFile);

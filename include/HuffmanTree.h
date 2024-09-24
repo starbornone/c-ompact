@@ -1,64 +1,52 @@
 #ifndef HUFFMANTREE_H
 #define HUFFMANTREE_H
 
-#include <iostream>
-#include <queue>
 #include <unordered_map>
-#include <vector>
 #include <string>
-#include <fstream>
+#include <memory>
+#include <iostream>
 
-// Node structure for the Huffman tree
+// Node structure for Huffman Tree
 struct Node
 {
-  char ch;     // Character
-  int freq;    // Frequency of the character
-  Node *left;  // Left child
-  Node *right; // Right child
+  char character;
+  int frequency;
+  std::unique_ptr<Node> left;
+  std::unique_ptr<Node> right;
 
-  Node(char character, int frequency)
-      : ch(character), freq(frequency), left(nullptr), right(nullptr) {}
+  Node(char ch, int freq);
+  Node(std::unique_ptr<Node> l, std::unique_ptr<Node> r);
 };
 
-// Comparator for the priority queue (min-heap)
-struct compare
-{
-  bool operator()(Node *left, Node *right)
-  {
-    return left->freq > right->freq;
-  }
-};
-
+// HuffmanTree class declaration
 class HuffmanTree
 {
 public:
   HuffmanTree();
   ~HuffmanTree();
 
-  // Build the Huffman tree based on character frequencies
   void build(const std::unordered_map<char, int> &frequencies);
+  void generateCodes(const Node *node, const std::string &code);
+  std::unordered_map<char, std::string> getCodes() const;
+  const Node *getRoot() const;
 
-  // Generate Huffman codes from the tree
-  void generateCodes(Node *node, const std::string &str);
+  // Serialize and deserialize functions
+  void serializeTree(std::ostream &out) const; // Serialize the tree to a stream
 
-  // Get the generated Huffman codes
-  std::unordered_map<char, std::string> getCodes();
+  // This function sets the root by deserializing from the stream
+  void setRootFromStream(std::istream &in);
 
-  // Get the root of the Huffman tree
-  Node *getRoot();
-
-  // Serialize the Huffman tree to an output stream
-  void serializeTree(Node *node, std::ostream &out);
-
-  // Deserialize the Huffman tree from an input stream
-  Node *deserializeTree(std::istream &in);
-
-  // Destroy the tree and free memory
-  void destroyTree(Node *node);
+  // This function returns a unique_ptr<Node> by deserializing from the stream
+  std::unique_ptr<Node> deserializeTree(std::istream &in) const;
 
 private:
-  Node *root;                                  // Root of the Huffman tree
-  std::unordered_map<char, std::string> codes; // Map of characters to their Huffman codes
+  std::unique_ptr<Node> root;
+  std::unordered_map<char, std::string> codes;
+
+  void serializeTree(const Node *node, std::ostream &out) const;
+
+  // Helper function to return std::unique_ptr<Node>
+  std::unique_ptr<Node> deserializeTreeHelper(std::istream &in) const;
 };
 
 #endif // HUFFMANTREE_H

@@ -9,6 +9,7 @@
 #include <direct.h>
 #endif
 
+// Function to calculate frequencies of characters in a file
 std::unordered_map<char, int> calculateFrequencies(const std::string &filename)
 {
   std::unordered_map<char, int> frequencies;
@@ -30,6 +31,7 @@ std::unordered_map<char, int> calculateFrequencies(const std::string &filename)
   return frequencies;
 }
 
+// Function to encode a file using the Huffman tree
 void encodeFile(const std::string &inputFilename, const std::string &outputFilename, HuffmanTree &huffmanTree, const std::unordered_map<char, std::string> &codes)
 {
   std::ifstream inFile(inputFilename, std::ios::binary);
@@ -42,7 +44,7 @@ void encodeFile(const std::string &inputFilename, const std::string &outputFilen
   }
 
   // Step 1: Serialize the Huffman tree
-  huffmanTree.serializeTree(huffmanTree.getRoot(), outFile);
+  huffmanTree.serializeTree(outFile);
 
   // Step 2: Read the input file and build the encoded string
   std::string encodedString;
@@ -77,6 +79,7 @@ void encodeFile(const std::string &inputFilename, const std::string &outputFilen
   outFile.close();
 }
 
+// Function to decode a file using the Huffman tree
 void decodeFile(const std::string &inputFilename, const std::string &outputFilename)
 {
   std::ifstream inFile(inputFilename, std::ios::binary);
@@ -90,7 +93,7 @@ void decodeFile(const std::string &inputFilename, const std::string &outputFilen
 
   // Step 1: Deserialize the Huffman tree
   HuffmanTree huffmanTree;
-  Node *root = huffmanTree.deserializeTree(inFile);
+  std::unique_ptr<Node> root = huffmanTree.deserializeTree(inFile);
 
   if (!root)
   {
@@ -105,7 +108,6 @@ void decodeFile(const std::string &inputFilename, const std::string &outputFilen
   if (!inFile.get(paddingChar))
   {
     std::cerr << "Error reading padding information." << std::endl;
-    huffmanTree.destroyTree(root);
     inFile.close();
     outFile.close();
     return;
@@ -128,33 +130,31 @@ void decodeFile(const std::string &inputFilename, const std::string &outputFilen
   }
 
   // Step 5: Decode the encoded string using the Huffman tree
-  Node *current = root;
+  const Node *current = root.get();
   for (size_t i = 0; i < encodedString.size(); ++i)
   {
     if (encodedString[i] == '0')
     {
-      current = current->left;
+      current = current->left.get();
     }
     else
     {
-      current = current->right;
+      current = current->right.get();
     }
 
     // If leaf node, write the character and reset to root
     if (!current->left && !current->right)
     {
-      outFile.put(current->ch);
-      current = root;
+      outFile.put(current->character);
+      current = root.get();
     }
   }
-
-  // Clean up the dynamically allocated tree
-  huffmanTree.destroyTree(root);
 
   inFile.close();
   outFile.close();
 }
 
+// Function to compare two files byte by byte
 bool compareFiles(const std::string &file1, const std::string &file2)
 {
   std::ifstream f1(file1, std::ios::binary | std::ios::ate);
@@ -189,13 +189,12 @@ bool compareFiles(const std::string &file1, const std::string &file2)
   return true;
 }
 
+// Function to create a directory if it does not exist
 void createDirectoryIfNotExists(const std::string &directory)
 {
 #ifdef _WIN32
-  // Windows-specific implementation
   _mkdir(directory.c_str());
 #else
-  // POSIX implementation
   mkdir(directory.c_str(), 0777);
 #endif
 }
