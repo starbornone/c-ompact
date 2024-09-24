@@ -8,41 +8,46 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Include directories
 include_directories(include)
 
-# Source files for the main executable
-set(SOURCES
-    main.cpp
-    src/HuffmanTree.cpp
-    src/utils.cpp
-)
-
-# Source files for the test executable
-set(TEST_SOURCES
-    tests/test_huffman.cpp
-    src/HuffmanTree.cpp
-    src/utils.cpp
+# Add the main executable with all required source files
+add_executable(
+    cppompact
+    src/main.cpp 
+    src/ArgumentParser.cpp 
+    src/FileUtils.cpp 
+    src/Handler.cpp 
+    src/HuffmanTree.cpp 
+    src/EncodeDecodeUtils.cpp 
+    src/FrequencyUtils.cpp 
+    src/FileComparisonUtils.cpp
+    src/HuffmanSerializer.cpp
+    src/HuffmanCodeGenerator.cpp  # Include the new file
+    src/Node.cpp                  # Include the new file
 )
 
 # Add Google Test subdirectory
 add_subdirectory(googletest)
 
-# Add the main executable
-add_executable(cppompact ${SOURCES})
-
-# Link Google Test libraries to the main executable (optional if you need GTest in main)
-target_link_libraries(cppompact gtest gtest_main)
-
-# Add the test executable
-add_executable(cppompact_tests ${TEST_SOURCES})
+# Create a test executable with all required source files
+add_executable(
+    cppompact_tests
+    tests/test_huffman.cpp 
+    src/ArgumentParser.cpp 
+    src/FileUtils.cpp 
+    src/Handler.cpp 
+    src/HuffmanTree.cpp 
+    src/EncodeDecodeUtils.cpp 
+    src/FrequencyUtils.cpp 
+    src/FileComparisonUtils.cpp
+    src/HuffmanSerializer.cpp
+    src/HuffmanCodeGenerator.cpp  # Include the new file
+    src/Node.cpp                  # Include the new file
+)
 
 # Link Google Test libraries to the test executable
 target_link_libraries(cppompact_tests gtest gtest_main)
 
-# Ensure include directories are set for both executables
-target_include_directories(cppompact PRIVATE include)
-target_include_directories(cppompact_tests PRIVATE include)
-
 # Enable testing
 enable_testing()
 
-# Add a test for the test executable
+# Add a test for the executable
 add_test(NAME cppompact_tests COMMAND cppompact_tests)

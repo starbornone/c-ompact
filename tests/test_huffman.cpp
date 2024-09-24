@@ -1,15 +1,15 @@
 #include "gtest/gtest.h"
 #include "../include/HuffmanTree.h"
-#include "../include/utils.h"
-#include <filesystem>
+#include "../include/FileUtils.h"
+#include "../include/EncodeDecodeUtils.h"
+#include "../include/FrequencyUtils.h"
+#include "../include/FileComparisonUtils.h"
+#include "../include/HuffmanCodeGenerator.h"
 #include <fstream>
 
-// Test case for basic Huffman Tree functionality
-// This test checks if the Huffman Tree correctly generates Huffman codes for a set of given character frequencies.
 TEST(HuffmanTreeTest, BasicFunctionality)
 {
   // Step 1: Define character frequencies
-  // These frequencies determine how the Huffman Tree is built. Higher frequency characters get shorter codes.
   std::unordered_map<char, int> freqs = {
       {'a', 5}, {'b', 9}, {'c', 12}, {'d', 13}, {'e', 16}, {'f', 45}};
 
@@ -17,23 +17,17 @@ TEST(HuffmanTreeTest, BasicFunctionality)
   HuffmanTree tree;
   tree.build(freqs);
 
-  // Step 3: Generate Huffman codes for each character
-  tree.generateCodes(tree.getRoot(), "");
+  // Step 3: Use HuffmanCodeGenerator to generate Huffman codes for each character
+  HuffmanCodeGenerator codeGenerator;
+  std::unordered_map<char, std::string> codes;
+  codeGenerator.generateCodes(tree.getRoot(), "", codes);
 
-  // Step 4: Retrieve the generated codes from the tree
-  std::unordered_map<char, std::string> codes = tree.getCodes();
-
-  // Verify that the codes are generated (there should be more than zero codes)
+  // Step 4: Verify that the codes are generated correctly
   EXPECT_GT(codes.size(), 0);
-
-  // Check specific Huffman codes for correctness (these values are implementation-specific and may vary)
-  // The character 'f' is expected to have the shortest code because it has the highest frequency.
   EXPECT_EQ(codes['f'], "0");    // 'f' should have the shortest code in the tree
   EXPECT_EQ(codes['a'], "1100"); // Adjust these based on the actual generated codes
 }
 
-// Test case for file encoding functionality
-// This test verifies that the encodeFile function correctly encodes a text file using Huffman coding.
 TEST(UtilsTest, EncodeFile)
 {
   // Step 1: Define character frequencies for the test input
@@ -44,17 +38,18 @@ TEST(UtilsTest, EncodeFile)
   HuffmanTree tree;
   tree.build(freqs);
 
-  // Step 3: Generate Huffman codes for each character in the tree
-  tree.generateCodes(tree.getRoot(), "");
-  std::unordered_map<char, std::string> codes = tree.getCodes();
+  // Step 3: Generate Huffman codes using HuffmanCodeGenerator
+  HuffmanCodeGenerator codeGenerator;
+  std::unordered_map<char, std::string> codes;
+  codeGenerator.generateCodes(tree.getRoot(), "", codes);
 
   // Step 4: Ensure that necessary directories exist for the test files
-  createDirectoryIfNotExists("tests");  // Directory for input files
-  createDirectoryIfNotExists("output"); // Directory for output files
+  createDirectoryIfNotExists("tests");
+  createDirectoryIfNotExists("output");
 
   // Step 5: Specify paths for the input and encoded files
-  std::string input = "tests/sample_input.txt";      // Input file to be encoded
-  std::string encoded = "output/sample_encoded.bin"; // Encoded output file
+  std::string input = "tests/sample_input.txt";
+  std::string encoded = "output/sample_encoded.bin";
 
   // Step 6: Create and write the sample content to the input file
   std::ofstream out(input);
@@ -75,8 +70,6 @@ TEST(UtilsTest, EncodeFile)
   encodedFile.close();
 }
 
-// Test case for file decoding functionality
-// This test checks if the decodeFile function correctly decodes a previously encoded file, restoring the original content.
 TEST(UtilsTest, DecodeFile)
 {
   // Step 1: Define character frequencies for the test input
@@ -87,18 +80,19 @@ TEST(UtilsTest, DecodeFile)
   HuffmanTree tree;
   tree.build(freqs);
 
-  // Step 3: Generate Huffman codes for each character in the tree
-  tree.generateCodes(tree.getRoot(), "");
-  std::unordered_map<char, std::string> codes = tree.getCodes();
+  // Step 3: Generate Huffman codes using HuffmanCodeGenerator
+  HuffmanCodeGenerator codeGenerator;
+  std::unordered_map<char, std::string> codes;
+  codeGenerator.generateCodes(tree.getRoot(), "", codes);
 
   // Step 4: Ensure that necessary directories exist for the test files
-  createDirectoryIfNotExists("tests");  // Directory for input files
-  createDirectoryIfNotExists("output"); // Directory for output files
+  createDirectoryIfNotExists("tests");
+  createDirectoryIfNotExists("output");
 
   // Step 5: Specify paths for the input, encoded, and decoded files
-  std::string input = "tests/sample_input.txt";      // Input file to be encoded
-  std::string encoded = "output/sample_encoded.bin"; // Encoded output file
-  std::string decoded = "output/sample_decoded.txt"; // Decoded output file (to be compared with the input)
+  std::string input = "tests/sample_input.txt";
+  std::string encoded = "output/sample_encoded.bin";
+  std::string decoded = "output/sample_decoded.txt";
 
   // Step 6: Create and write the sample content to the input file
   std::ofstream out(input);
@@ -120,7 +114,6 @@ TEST(UtilsTest, DecodeFile)
   EXPECT_TRUE(compareFiles(input, decoded)) << "Decoded file does not match the original: " << decoded;
 }
 
-// Main function to run all the test cases defined above
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
