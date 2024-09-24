@@ -1,0 +1,28 @@
+# Compiled object files
+*.o
+
+# Compiled binary files
+c++ompact.exe
+c++ompact
+
+# Debug files
+*.dSYM
+*.pdb
+
+# Backup files
+*~ 
+*.bak
+
+# WSL specific files
+*.out
+*.so
+*.a
+*.dll
+
+# IDE specific files
+.vscode/
+*.code-workspace
+
+# Temporary files
+*.tmp
+*.log
