@@ -1,28 +1,69 @@
-# Compiled object files
+# Compiled Object files
 *.o
+*.obj
 
-# Compiled binary files
-c++ompact.exe
-c++ompact
-
-# Debug files
-*.dSYM
-*.pdb
-
-# Backup files
-*~ 
-*.bak
-
-# WSL specific files
-*.out
+# Compiled Dynamic libraries
 *.so
-*.a
+*.dylib
 *.dll
 
-# IDE specific files
+# Compiled Static libraries
+*.lib
+*.a
+
+# Executable files
+*.exe
+*.out
+*.app
+cppompact
+cppompact_tests
+
+# CMake build directory
+/build/
+CMakeFiles/
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+Testing/
+CTestTestfile.cmake
+
+# IDE-specific files (VS Code, CLion, etc.)
 .vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
 *.code-workspace
 
-# Temporary files
-*.tmp
+# Logs and temporary files
 *.log
+*.tmp
+*.swp
+
+# Google Test files and dependencies
+googletest/
+googletest/Makefile
+googletest/CMakeFiles/
+googletest/build/
+googletest/CMakeCache.txt
+googletest/cmake_install.cmake
+
+# Generated directories and files from tests
+/tests/sample_input.txt
+/output/
+
+# System-specific files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*~
+
+# Generated binary files
+*.bin
+
+# Dependency manager files
+.vcpkg/
+conanbuild/
+conaninfo.txt
+conan.lock
