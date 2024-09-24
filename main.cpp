@@ -1,8 +1,9 @@
 #include "include/HuffmanTree.h"
 #include "include/utils.h"
-#include <iostream>      // For standard I/O operations
-#include <string>        // For std::string operations
-#include <unordered_map> // For character frequency storage
+#include <iostream>
+#include <string>
+#include <unordered_map>
+#include <fstream>
 
 // Function to display usage information
 void printUsage()
@@ -75,36 +76,92 @@ bool parseArguments(int argc, char *argv[], std::string &mode, std::string &inpu
   return true;
 }
 
-// Function to handle file encoding
-void handleEncoding(const std::string &inputFile, const std::string &outputFile)
+// Function to check if a file exists and is readable
+bool isFileReadable(const std::string &filename)
 {
-  // Calculate character frequencies from the input file
-  std::unordered_map<char, int> frequencies = calculateFrequencies(inputFile);
-  if (frequencies.empty())
-  {
-    std::cerr << "Error: Input file is empty or not found: " << inputFile << "\n";
-    return;
-  }
-
-  // Build and generate Huffman codes
-  HuffmanTree huffmanTree;
-  huffmanTree.build(frequencies);
-  huffmanTree.generateCodes(huffmanTree.getRoot(), "");
-
-  // Retrieve the generated Huffman codes
-  std::unordered_map<char, std::string> codes = huffmanTree.getCodes();
-
-  // Encode the input file
-  encodeFile(inputFile, outputFile, huffmanTree, codes);
-  std::cout << "Encoding completed. Encoded data saved to " << outputFile << std::endl;
+  std::ifstream infile(filename);
+  return infile.good();
 }
 
-// Function to handle file decoding
+// Function to check if a file is writable or can be created
+bool isFileWritable(const std::string &filename)
+{
+  std::ofstream outfile(filename);
+  return outfile.good();
+}
+
+// Function to handle file encoding with enhanced error handling
+void handleEncoding(const std::string &inputFile, const std::string &outputFile)
+{
+  try
+  {
+    // Check if input file is readable
+    if (!isFileReadable(inputFile))
+    {
+      std::cerr << "Error: Cannot read input file: " << inputFile << "\n";
+      return;
+    }
+
+    // Check if output file can be written
+    if (!isFileWritable(outputFile))
+    {
+      std::cerr << "Error: Cannot write to output file: " << outputFile << "\n";
+      return;
+    }
+
+    // Calculate character frequencies from the input file
+    std::unordered_map<char, int> frequencies = calculateFrequencies(inputFile);
+    if (frequencies.empty())
+    {
+      std::cerr << "Error: Input file is empty or not found: " << inputFile << "\n";
+      return;
+    }
+
+    // Build and generate Huffman codes
+    HuffmanTree huffmanTree;
+    huffmanTree.build(frequencies);
+    huffmanTree.generateCodes(huffmanTree.getRoot(), "");
+
+    // Retrieve the generated Huffman codes
+    std::unordered_map<char, std::string> codes = huffmanTree.getCodes();
+
+    // Encode the input file
+    encodeFile(inputFile, outputFile, huffmanTree, codes);
+    std::cout << "Encoding completed. Encoded data saved to " << outputFile << std::endl;
+  }
+  catch (const std::exception &e)
+  {
+    std::cerr << "Error during encoding: " << e.what() << std::endl;
+  }
+}
+
+// Function to handle file decoding with enhanced error handling
 void handleDecoding(const std::string &inputFile, const std::string &outputFile)
 {
-  // Decode the encoded file back to its original content
-  decodeFile(inputFile, outputFile);
-  std::cout << "Decoding completed. Decoded data saved to " << outputFile << std::endl;
+  try
+  {
+    // Check if input file is readable
+    if (!isFileReadable(inputFile))
+    {
+      std::cerr << "Error: Cannot read input file: " << inputFile << "\n";
+      return;
+    }
+
+    // Check if output file can be written
+    if (!isFileWritable(outputFile))
+    {
+      std::cerr << "Error: Cannot write to output file: " << outputFile << "\n";
+      return;
+    }
+
+    // Decode the encoded file back to its original content
+    decodeFile(inputFile, outputFile);
+    std::cout << "Decoding completed. Decoded data saved to " << outputFile << std::endl;
+  }
+  catch (const std::exception &e)
+  {
+    std::cerr << "Error during decoding: " << e.what() << std::endl;
+  }
 }
 
 int main(int argc, char *argv[])
@@ -120,7 +177,15 @@ int main(int argc, char *argv[])
   }
 
   // Ensure the output directory exists
-  createDirectoryIfNotExists("output");
+  try
+  {
+    createDirectoryIfNotExists("output");
+  }
+  catch (const std::exception &e)
+  {
+    std::cerr << "Error creating output directory: " << e.what() << std::endl;
+    return 1;
+  }
 
   // Perform the selected operation
   if (mode == "encode")
