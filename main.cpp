@@ -1,5 +1,5 @@
-#include "HuffmanTree.h"
-#include "utils.h"
+#include "include/HuffmanTree.h"
+#include "include/utils.h"
 
 int main()
 {

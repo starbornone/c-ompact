@@ -1,4 +1,4 @@
-#include "HuffmanTree.h"
+#include "../include/HuffmanTree.h"
 
 HuffmanTree::HuffmanTree() : root(nullptr) {}
 
