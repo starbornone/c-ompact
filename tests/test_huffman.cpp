@@ -1,12 +1,14 @@
 #include "gtest/gtest.h"
 #include "../include/HuffmanTree.h"
 #include "../include/FileUtils.h"
-#include "../include/EncodeDecodeUtils.h"
+#include "../include/EncodeFile.h"
+#include "../include/DecodeFile.h"
 #include "../include/FrequencyUtils.h"
 #include "../include/FileComparisonUtils.h"
 #include "../include/HuffmanCodeGenerator.h"
 #include <fstream>
 
+// Test the basic functionality of the HuffmanTree and code generation
 TEST(HuffmanTreeTest, BasicFunctionality)
 {
   // Step 1: Define character frequencies
@@ -28,6 +30,7 @@ TEST(HuffmanTreeTest, BasicFunctionality)
   EXPECT_EQ(codes['a'], "1100"); // Adjust these based on the actual generated codes
 }
 
+// Test the encoding of a file
 TEST(UtilsTest, EncodeFile)
 {
   // Step 1: Define character frequencies for the test input
@@ -70,6 +73,7 @@ TEST(UtilsTest, EncodeFile)
   encodedFile.close();
 }
 
+// Test the decoding of a file
 TEST(UtilsTest, DecodeFile)
 {
   // Step 1: Define character frequencies for the test input
@@ -108,12 +112,13 @@ TEST(UtilsTest, DecodeFile)
   encodeFile(input, encoded, tree, codes);
 
   // Step 8: Decode the encoded file back to its original form
-  decodeFile(encoded, decoded);
+  decodeFile(encoded, decoded, tree);
 
   // Step 9: Verify that the decoded file matches the original input file
   EXPECT_TRUE(compareFiles(input, decoded)) << "Decoded file does not match the original: " << decoded;
 }
 
+// Main function for running the tests
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

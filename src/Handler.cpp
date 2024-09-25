@@ -1,7 +1,8 @@
 #include "../include/Handler.h"
 #include "../include/HuffmanTree.h"
 #include "../include/HuffmanCodeGenerator.h"
-#include "../include/EncodeDecodeUtils.h"
+#include "../include/EncodeFile.h"
+#include "../include/DecodeFile.h"
 #include "../include/FrequencyUtils.h"
 #include "../include/FileUtils.h"
 #include <iostream>
@@ -78,7 +79,8 @@ void handleDecoding(const std::string &inputFile, const std::string &outputFile)
       return;
     }
 
-    decodeFile(inputFile, outputFile);
+    HuffmanTree huffmanTree;
+    decodeFile(inputFile, outputFile, huffmanTree);
     std::cout << "Decoding completed. Decoded data saved to " << outputFile << std::endl;
   }
   catch (const std::exception &e)
