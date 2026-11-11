@@ -1,0 +1,121 @@
+{
+  "schema": "name-roadmap/v1",
+  "file": "roadmap",
+  "updatedAt": "2026-11-11T23:13:00+11:00",
+  "project": {
+    "key": "c-ompact",
+    "title": "c++ompact",
+    "status": "active",
+    "summary": "C++17 Huffman compression CLI that encodes and decodes files via CMake and Google Test."
+  },
+  "items": [
+    {
+      "id": "fix-final-byte-padding-shift",
+      "title": "Stop left-shifting the final packed byte before writing padding",
+      "group": "correctness",
+      "notes": "Code review Critical: Encode places bits in the high end of the byte; an extra <<= padding corrupts non-byte-aligned payloads and breaks round-trips."
+    },
+    {
+      "id": "fix-single-symbol-huffman-codes",
+      "title": "Assign a non-empty code when the tree is a single leaf",
+      "group": "correctness",
+      "notes": "Code review Critical: One distinct byte currently gets code \"\", so encode writes no payload and decode yields an empty file."
+    },
+    {
+      "id": "fix-writable-check-truncation",
+      "title": "Make isFileWritable non-destructive",
+      "group": "correctness",
+      "notes": "Code review Critical: Opening the output with ofstream as a writability check truncates existing files and can destroy input when paths coincide."
+    },
+    {
+      "id": "guard-empty-tree-and-padding",
+      "title": "Reject empty frequency maps and unsafe padding erase",
+      "group": "correctness",
+      "notes": "Code review Critical: HuffmanTree::build on an empty map is UB; decode padding erase can underflow size_t on short payloads."
+    },
+    {
+      "id": "harden-corrupt-tree-decode",
+      "title": "Fail cleanly on truncated trees and null child walks",
+      "group": "correctness",
+      "notes": "Code review High: Deserialize of truncated '0' nodes and decode left/right walks can null-deref instead of returning a clear error."
+    },
+    {
+      "id": "repair-googletest-submodule",
+      "title": "Make Google Test checkout reliable for cmake configure",
+      "group": "tooling",
+      "notes": "Code review High: README tells users to run git submodule update --init --recursive; ensure googletest is actually pinned and present so add_subdirectory succeeds."
+    },
+    {
+      "id": "fix-gtest-duplicate-main",
+      "title": "Link tests against a single Google Test main",
+      "group": "testing",
+      "notes": "Code review High: tests/test_huffman.cpp defines main while CMake also links gtest_main."
+    },
+    {
+      "id": "add-round-trip-edge-tests",
+      "title": "Cover single-byte, binary, and non-aligned bit-length round-trips",
+      "group": "testing",
+      "notes": "Code review High/Medium: Current suite is thin and CWD-sensitive; strengthen behaviour checks after packing fixes."
+    },
+    {
+      "id": "propagate-cli-exit-codes",
+      "title": "Return non-zero from main when encode or decode fails",
+      "group": "cli",
+      "notes": "Code review High: Handlers print errors but main still exits 0; --help currently shares the failure return path."
+    },
+    {
+      "id": "unify-encode-decode-error-policy",
+      "title": "Use one error strategy across encode, decode, and frequency utils",
+      "group": "error-handling",
+      "notes": "Code review Medium: Encode throws; decode and calculateFrequencies often cerr+return, so failures are easy to miss."
+    },
+    {
+      "id": "add-compressed-format-framing",
+      "title": "Add magic, version, and length or checksum to the compressed format",
+      "group": "format",
+      "notes": "Code review High: Any byte stream is accepted as a tree today; framing rejects non-cppompact files and detects truncation."
+    },
+    {
+      "id": "stream-decode-without-bitstring",
+      "title": "Decode payload bits without building an 8x character string",
+      "group": "performance",
+      "notes": "Code review High: Large files expand to roughly eight times payload size in memory during decode."
+    },
+    {
+      "id": "collapse-dead-huffmantree-apis",
+      "title": "Remove or finish unused HuffmanTree serialize/codes paths",
+      "group": "maintainability",
+      "notes": "Code review Medium: serializeTree is declared but undefined; setCodes/getCodes and decodeFile's HuffmanTree& are unused by the real I/O path."
+    },
+    {
+      "id": "stop-hardcoded-output-mkdir",
+      "title": "Stop always creating a hardcoded output directory from main",
+      "group": "cli",
+      "notes": "Code review Medium: main always createDirectoryIfNotExists(\"output\") even when the user passes unrelated paths."
+    },
+    {
+      "id": "widen-frequency-counters",
+      "title": "Use 64-bit counters for byte frequencies",
+      "group": "correctness",
+      "notes": "Code review Medium: int frequencies overflow above ~2^31 occurrences of one byte."
+    },
+    {
+      "id": "add-sample-input-fixture",
+      "title": "Provide or generate the sample input the README encodes",
+      "group": "dx",
+      "notes": "Code review Medium: README examples use ../input/input.txt, which is not in the repo today."
+    },
+    {
+      "id": "document-windows-cmake-generators",
+      "title": "Document cmake --build and non-Make Windows generators in the README",
+      "group": "docs",
+      "notes": "Code review Medium: Windows section still assumes make; multi-config output dirs are undocumented."
+    },
+    {
+      "id": "enable-compiler-warnings",
+      "title": "Turn on -Wall/-Wextra or MSVC /W4 for cppompact_lib",
+      "group": "tooling",
+      "notes": "Code review Low: Warning flags in CMakeLists.txt are commented out."
+    }
+  ]
+}

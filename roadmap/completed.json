@@ -1,0 +1,68 @@
+{
+  "schema": "name-roadmap/v1",
+  "file": "completed",
+  "updatedAt": "2026-11-11T23:09:23+11:00",
+  "project": {
+    "key": "c-ompact",
+    "title": "c++ompact",
+    "status": "active"
+  },
+  "items": [
+    {
+      "id": "ship-cmake-library-and-cli",
+      "title": "Ship CMake build for cppompact_lib and cppompact executable",
+      "group": "build",
+      "notes": "Out-of-source build/ with C++17 produces cppompact or cppompact.exe as documented in the README.",
+      "completedAt": "2026-11-11T23:09:23+11:00"
+    },
+    {
+      "id": "ship-encode-cli",
+      "title": "Ship --encode / -e file compression command",
+      "group": "cli",
+      "notes": "README documents encoding an input path to an output binary.",
+      "completedAt": "2026-11-11T23:09:23+11:00"
+    },
+    {
+      "id": "ship-decode-cli",
+      "title": "Ship --decode / -d file decompression command",
+      "group": "cli",
+      "notes": "README documents decoding an encoded binary back to a text/output file.",
+      "completedAt": "2026-11-11T23:09:23+11:00"
+    },
+    {
+      "id": "ship-help-cli",
+      "title": "Ship --help / -h usage output",
+      "group": "cli",
+      "notes": "README documents displaying usage and available options.",
+      "completedAt": "2026-11-11T23:09:23+11:00"
+    },
+    {
+      "id": "ship-huffman-encode-decode-pipeline",
+      "title": "Implement Huffman tree build, serialize, pack, and decode walk",
+      "group": "core",
+      "notes": "Library modules under src/ and include/ implement the compression pipeline the CLI invokes.",
+      "completedAt": "2026-11-11T23:09:23+11:00"
+    },
+    {
+      "id": "ship-gtest-test-target",
+      "title": "Add cppompact_tests Google Test target in CMake",
+      "group": "testing",
+      "notes": "README documents make cppompact_tests and running ./cppompact_tests; submodule troubleshooting is covered.",
+      "completedAt": "2026-11-11T23:09:23+11:00"
+    },
+    {
+      "id": "ship-windows-exe-usage-notes",
+      "title": "Document Windows .exe invocation in the README",
+      "group": "docs",
+      "notes": "README Handling Windows Builds section covers cppompact.exe encode examples.",
+      "completedAt": "2026-11-11T23:09:23+11:00"
+    },
+    {
+      "id": "ship-agent-ready-docs-slice",
+      "title": "Add docs/, roadmap JSON, and AGENTS.md for agent-ready contribution",
+      "group": "docs",
+      "notes": "Documentation set linked from the README: overview, architecture, getting started, development, contributing, decisions, roadmap format.",
+      "completedAt": "2026-11-11T23:09:23+11:00"
+    }
+  ]
+}

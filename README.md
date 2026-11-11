@@ -1,5 +1,15 @@
 # c++ompact
 
+Huffman compression CLI for encoding and decoding files (`cppompact`).
+
+## Documentation
+
+- [Overview](docs/overview.md) — what this project is and is not
+- [Getting started](docs/getting-started.md) — build, encode, decode, verify
+- [Architecture](docs/architecture.md) — modules and data flow
+- [AGENTS.md](AGENTS.md) — conventions for coding agents
+- [Roadmap](roadmap/roadmap.json) — prioritized open work
+
 ## Building the Project
 
 Create a directory named `build` (if it doesn’t already exist) and navigate into it:
